@@ -3,6 +3,12 @@ var microbreakMin = 5
 var seconds = 0;
 var interval = 0;
 
+if (!('Notification' in window)) {
+    alert('Browser does not support notifications');
+} else if (Notification.permission !== 'denied') {
+    Notification.requestPermission();
+}
+
 interval = setInterval(breakTimer, 1000);
 $('#reset').on('click', function(){
     clearInterval(interval);
@@ -23,14 +29,14 @@ function breakTimer() {
             interval = setInterval(function(){
                 $('#break').fadeOut(750).fadeIn(750);
                 $('#microbreak').fadeOut(750).fadeIn(750);
-
-                if (Notification.permission === 'granted') {
-                    new Notification('Pomodoro finished!');
-                }
             }, 750);
+
+            if (Notification.permission === 'granted') {
+                new Notification('Pomodoro finished!');
+            }
         }
         else if (microbreakMin == 0) {
-            microbreakMin = 0;
+            microbreakMin = 5;
 
             if (Notification.permission === 'granted') {
                 new Notification('Hands off the keyboard!  Take a microbreak now');
