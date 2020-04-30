@@ -1,41 +1,52 @@
-var breakInt = 0;
-var microbreakInt = 0;
-var smallbreakInt = 0;
-var longbreakInt = 0;
 var breakMin = 25;
-var microbreakMin = 5;
-var smallbreakMin = 5;
-var longbreakMin = 15;
+var microbreakMin = 5
 var seconds = 0;
-var repeat = 5;
+var interval = 0;
 
-microbreak();
-microbreakInt = setInterval(microbreak, 1000);
+interval = setInterval(breakTimer, 1000);
+$('#reset').on('click', function(){
+    clearInterval(interval);
+    breakMin = 25;
+    microbreakMin = 5;
+    seconds = 0;
+    formatter(breakMin, seconds, $('#break'));
+    formatter(microbreakMin, seconds, $('#microbreak'));
+    interval = setInterval(breakTimer, 1000);
+});
 
-function microbreak() {
+function breakTimer() {
     var format = true;
     if (seconds == 0) {
-        if (microbreakMin == 0) {
-            if (repeat > 0) {
-                microbreakMin = 5;
-                repeat -= 1;
+        if (breakMin == 0) {
+            format = false;
+            clearInterval(interval);
+            interval = setInterval(function(){
+                $('#break').fadeOut(750).fadeIn(750);
+                $('#microbreak').fadeOut(750).fadeIn(750);
 
                 if (Notification.permission === 'granted') {
-                    new Notification('Hands off the keyboard!  Take a microbreak.');
+                    new Notification('Pomodoro finished!');
                 }
-            } else {
-                format = false;
-                clearInterval(microbreakInt);
-                microbreakInt = setInterval(function(){
-                    $('#microbreak').fadeOut(750).fadeIn(750);
-                }, 750);
+            }, 750);
+        }
+        else if (microbreakMin == 0) {
+            microbreakMin = 0;
+
+            if (Notification.permission === 'granted') {
+                new Notification('Hands off the keyboard!  Take a microbreak now');
             }
         }
-        seconds = 60
+        seconds = 60;
+        breakMin -= 1;
         microbreakMin -= 1;
+        if (format) {
+            formatter(breakMin, seconds, $('#break'));
+            formatter(microbreakMin, seconds, $('#microbreak'));
+        }
     }
     seconds -= 1;
     if (format) {
+        formatter(breakMin, seconds, $('#break'));
         formatter(microbreakMin, seconds, $('#microbreak'));
     }
 }
